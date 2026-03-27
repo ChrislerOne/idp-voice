@@ -1,0 +1,39 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "idp-voice.fullname" . }}
+  labels:
+    {{- include "idp-voice.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer | quote }}
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: {{ include "idp-voice.fullname" . }}-tls
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "idp-voice.fullname" . }}-backend
+                port:
+                  number: {{ .Values.backend.port }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "idp-voice.fullname" . }}-frontend
+                port:
+                  number: {{ .Values.frontend.port }}
+{{- end }}

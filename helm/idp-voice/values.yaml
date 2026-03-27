@@ -1,0 +1,49 @@
+imagePullSecrets:
+  - name: regcred
+
+backend:
+  image:
+    repository: personal
+    tag: backend
+    pullPolicy: IfNotPresent
+  replicas: 1
+  port: 8080
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+frontend:
+  image:
+    repository: personal
+    tag: frontend
+    pullPolicy: IfNotPresent
+  replicas: 1
+  port: 80
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+postgresql:
+  # CNPG operator secret name (contains username, password, host, port, dbname)
+  secretName: ""
+  # Keys in the CNPG secret
+  usernameKey: username
+  passwordKey: password
+  hostKey: host
+  portKey: port
+  dbnameKey: dbname
+
+ingress:
+  enabled: false
+  className: ""
+  host: idp-voice.local
+  clusterIssuer: zerossl
+  annotations: {}

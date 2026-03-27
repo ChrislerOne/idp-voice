@@ -1,0 +1,5 @@
+apiVersion: v2
+name: idp-voice
+description: IDP Voice — feature recommendation voting platform
+version: 0.1.0
+appVersion: "0.1.0"

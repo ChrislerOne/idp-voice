@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "idp-voice.fullname" . }}-backend
+  labels:
+    {{- include "idp-voice.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "idp-voice.name" . }}
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "idp-voice.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: backend
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: backend
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.backend.port }}
+              protocol: TCP
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.secretName }}
+                  key: {{ .Values.postgresql.hostKey }}
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.secretName }}
+                  key: {{ .Values.postgresql.portKey }}
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.secretName }}
+                  key: {{ .Values.postgresql.dbnameKey }}
+            - name: DATABASE_URL
+              value: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.secretName }}
+                  key: {{ .Values.postgresql.usernameKey }}
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.secretName }}
+                  key: {{ .Values.postgresql.passwordKey }}
+          startupProbe:
+            httpGet:
+              path: /api/recommendations
+              port: {{ .Values.backend.port }}
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/recommendations
+              port: {{ .Values.backend.port }}
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/recommendations
+              port: {{ .Values.backend.port }}
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}

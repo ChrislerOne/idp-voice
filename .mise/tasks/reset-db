@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#MISE description="Delete all recommendations from the SQLite database"
+set -e
+
+DB="idp-voice-backend/recommendations.db"
+
+if [ ! -f "$DB" ]; then
+  echo "No database found at $DB"
+  exit 0
+fi
+
+count=$(sqlite3 "$DB" "SELECT COUNT(*) FROM recommendations;")
+sqlite3 "$DB" "DELETE FROM recommendations;"
+echo "Deleted $count recommendations."

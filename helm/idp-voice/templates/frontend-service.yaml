@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "idp-voice.fullname" . }}-frontend
+  labels:
+    {{- include "idp-voice.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.frontend.port }}
+      targetPort: {{ .Values.frontend.port }}
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: {{ include "idp-voice.name" . }}
+    app.kubernetes.io/component: frontend

@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+#MISE description="Generate random mock recommendations"
+
+import json, random, urllib.request
+
+API = "http://localhost:8080/api/recommendations"
+
+FEATURES = [
+    "Add dark mode for the mobile app",
+    "Integrate Slack notifications for deployments",
+    "Support SSO with Azure AD",
+    "One-click rollback for failed deployments",
+    "Add a Terraform module registry",
+    "Improve search performance on large repos",
+    "Grafana dashboard templates per team",
+    "Automatic PR previews with ephemeral environments",
+    "Self-service database provisioning",
+    "Built-in secrets rotation for Vault",
+    "GitOps workflow for Kubernetes manifests",
+    "Cost estimation before applying infra changes",
+    "Service catalog with dependency graph",
+    "API rate limiting dashboard",
+    "Custom CI/CD pipeline templates",
+    "Audit log export to SIEM",
+    "Multi-cluster Kubernetes support",
+    "Canary deployment automation",
+    "Developer portal with embedded docs",
+    "ChatOps bot for incident management",
+    "Automated compliance checks in pipelines",
+    "Environment drift detection",
+    "Resource tagging enforcement",
+    "On-call schedule integration",
+    "Feature flag management UI",
+    "Centralized logging with structured search",
+    "Auto-scaling policies per service",
+    "Shared library versioning dashboard",
+    "Webhook debugger for integrations",
+    "SLA monitoring with alerting",
+]
+
+NAMES = ["Anna M.", "Ben K.", "Chris L.", "Dana S.", "Erik P.", "Fiona R.", "George T.", "Hannah W.", None, None, None, None, None]
+
+def post(url, data=None):
+    body = json.dumps(data).encode() if data else b"{}"
+    req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"}, method="POST")
+    with urllib.request.urlopen(req) as resp:
+        return json.loads(resp.read())
+
+count = random.randint(8, 15)
+selected = random.sample(FEATURES, count)
+
+print(f"Seeding {count} recommendations...")
+for text in selected:
+    name = random.choice(NAMES)
+    payload = {"text": text}
+    if name:
+        payload["submitterName"] = name
+
+    rec = post(API, payload)
+    extra_votes = random.randint(0, 12)
+    for _ in range(extra_votes):
+        post(f"{API}/{rec['id']}/vote")
+
+    print(f"  + {text} ({extra_votes + 1} votes)")
+
+print("Done!")
