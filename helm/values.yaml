@@ -8,6 +8,7 @@ backend:
     pullPolicy: Always
   replicas: 1
   port: 8080
+  springProfile: prod
   resources:
     requests:
       cpu: 100m

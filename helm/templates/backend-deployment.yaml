@@ -31,7 +31,7 @@ spec:
               protocol: TCP
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: prod
+              value: {{ .Values.backend.springProfile | default "prod" }}
             - name: DB_HOST
               valueFrom:
                 secretKeyRef:
