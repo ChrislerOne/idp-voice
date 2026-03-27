@@ -1,0 +1,19 @@
+{{- if .Values.postgresql.enabled -}}
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ include "idp-voice.fullname" . }}-db
+  labels:
+    {{- include "idp-voice.labels" . | nindent 4 }}
+spec:
+  instances: {{ .Values.postgresql.instances | default 3 }}
+
+  # Example of how to configure storage
+  storage:
+    size: {{ .Values.postgresql.storage.size | default "1Gi" }}
+
+  bootstrap:
+    initdb:
+      database: {{ .Values.postgresql.database | default "recommendations" }}
+      owner: {{ .Values.postgresql.owner | default "app" }}
+{{- end }}

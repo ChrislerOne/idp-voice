@@ -3,9 +3,9 @@ imagePullSecrets:
 
 backend:
   image:
-    repository: personal
-    tag: backend
-    pullPolicy: IfNotPresent
+    repository: ghcr.io/chrislerone/idp-voice-backend
+    tag: latest
+    pullPolicy: Always
   replicas: 1
   port: 8080
   resources:
@@ -18,9 +18,9 @@ backend:
 
 frontend:
   image:
-    repository: personal
-    tag: frontend
-    pullPolicy: IfNotPresent
+    repository: ghcr.io/chrislerone/idp-voice-frontend
+    tag: latest
+    pullPolicy: Always
   replicas: 1
   port: 80
   resources:
@@ -32,10 +32,17 @@ frontend:
       memory: 128Mi
 
 postgresql:
-  # CNPG operator secret name (contains username, password, host, port, dbname)
+  enabled: true
+  instances: 3
+  storage:
+    size: 1Gi
+  database: recommendations
+  owner: app
+  # CNPG operator secret name (contains user, password, host, port, dbname)
+  # If empty, default to {{ include "idp-voice.fullname" . }}-db-app in templates
   secretName: ""
   # Keys in the CNPG secret
-  usernameKey: username
+  usernameKey: user
   passwordKey: password
   hostKey: host
   portKey: port

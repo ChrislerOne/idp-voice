@@ -35,29 +35,29 @@ spec:
             - name: DB_HOST
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.postgresql.secretName }}
+                  name: {{ .Values.postgresql.secretName | default (printf "%s-db-app" (include "idp-voice.fullname" .)) }}
                   key: {{ .Values.postgresql.hostKey }}
             - name: DB_PORT
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.postgresql.secretName }}
+                  name: {{ .Values.postgresql.secretName | default (printf "%s-db-app" (include "idp-voice.fullname" .)) }}
                   key: {{ .Values.postgresql.portKey }}
             - name: DB_NAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.postgresql.secretName }}
+                  name: {{ .Values.postgresql.secretName | default (printf "%s-db-app" (include "idp-voice.fullname" .)) }}
                   key: {{ .Values.postgresql.dbnameKey }}
             - name: DATABASE_URL
               value: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
             - name: DATABASE_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.postgresql.secretName }}
+                  name: {{ .Values.postgresql.secretName | default (printf "%s-db-app" (include "idp-voice.fullname" .)) }}
                   key: {{ .Values.postgresql.usernameKey }}
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.postgresql.secretName }}
+                  name: {{ .Values.postgresql.secretName | default (printf "%s-db-app" (include "idp-voice.fullname" .)) }}
                   key: {{ .Values.postgresql.passwordKey }}
           startupProbe:
             httpGet:
